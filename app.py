@@ -45,7 +45,7 @@ def main():
     
     col1, col2 = st.columns(2)
     with col1:
-        st.image("images/clean_room.jpg", caption="깨끗한 방의 예시", use_column_width=True)
+        st.image("images/clean.png", caption="깨끗한 방의 예시", use_column_width=True)
         st.success("✨ 깔끔하게 정리된 방")
         st.markdown("""
         - 물건들이 제자리에 있음
@@ -54,7 +54,7 @@ def main():
         """)
     
     with col2:
-        st.image("images/messy_room.jpg", caption="지저분한 방의 예시", use_column_width=True)
+        st.image("images/messy.png", caption="지저분한 방의 예시", use_column_width=True)
         st.warning("⚠️ 정리가 필요한 방")
         st.markdown("""
         - 물건들이 흩어져 있음
