@@ -91,7 +91,7 @@ def main():
                 
                 with img_col:
                     st.markdown("### 업로드된 이미지")
-                    st.image(image, use_column_width=True)
+                    st.image(image, use_container_width=True)
 
                 with result_col:
                     st.markdown("### 분석 결과")
@@ -134,43 +134,49 @@ def main():
                 st.markdown("---")
                 st.subheader("📊 분석 통계")
                 
-                # 통계 차트들을 3개의 컬럼으로 배치
-                stat_col1, stat_col2, stat_col3 = st.columns(3)
-                
-                with stat_col1:
-                    st.subheader("방 상태 분포")
-                    room_counts = df['result'].value_counts()
-                    fig_pie = alt.Chart(pd.DataFrame({
-                        'category': room_counts.index,
-                        'count': room_counts.values
-                    })).mark_arc().encode(
-                        theta='count',
-                        color='category',
-                        tooltip=['category', 'count']
-                    ).properties(width=200, height=200)
-                    st.altair_chart(fig_pie)
-                
-                with stat_col2:
-                    st.subheader("신뢰도 트렌드")
-                    recent_df = df.tail(10)
-                    confidence_trend = alt.Chart(recent_df).mark_line().encode(
-                        x='timestamp',
-                        y=alt.Y('confidence', title='신뢰도 (%)')
-                    ).properties(width=200, height=200)
-                    st.altair_chart(confidence_trend)
-                
-                with stat_col3:
-                    st.subheader("시간대별 분석")
-                    df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
-                    hourly_counts = df['hour'].value_counts().sort_index()
-                    hourly_chart = alt.Chart(pd.DataFrame({
-                        'hour': hourly_counts.index,
-                        'count': hourly_counts.values
-                    })).mark_bar().encode(
-                        x=alt.X('hour:O', title='시간'),
-                        y=alt.Y('count:Q', title='분석 횟수')
-                    ).properties(width=200, height=200)
-                    st.altair_chart(hourly_chart)
+                # 데이터 로드 및 DataFrame 변환
+                history = load_history()
+                if history:
+                    df = pd.DataFrame(history)
+                    df['date'] = pd.to_datetime(df['timestamp']).dt.date
+                    
+                    # 통계 차트들을 3개의 컬럼으로 배치
+                    stat_col1, stat_col2, stat_col3 = st.columns(3)
+                    
+                    with stat_col1:
+                        st.subheader("방 상태 분포")
+                        room_counts = df['result'].value_counts()
+                        fig_pie = alt.Chart(pd.DataFrame({
+                            'category': room_counts.index,
+                            'count': room_counts.values
+                        })).mark_arc().encode(
+                            theta='count',
+                            color='category',
+                            tooltip=['category', 'count']
+                        ).properties(width=200, height=200)
+                        st.altair_chart(fig_pie)
+                    
+                    with stat_col2:
+                        st.subheader("신뢰도 트렌드")
+                        recent_df = df.tail(10)
+                        confidence_trend = alt.Chart(recent_df).mark_line().encode(
+                            x='timestamp',
+                            y=alt.Y('confidence', title='신뢰도 (%)')
+                        ).properties(width=200, height=200)
+                        st.altair_chart(confidence_trend)
+                    
+                    with stat_col3:
+                        st.subheader("시간대별 분석")
+                        df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
+                        hourly_counts = df['hour'].value_counts().sort_index()
+                        hourly_chart = alt.Chart(pd.DataFrame({
+                            'hour': hourly_counts.index,
+                            'count': hourly_counts.values
+                        })).mark_bar().encode(
+                            x=alt.X('hour:O', title='시간'),
+                            y=alt.Y('count:Q', title='분석 횟수')
+                        ).properties(width=200, height=200)
+                        st.altair_chart(hourly_chart)
 
             # 하단 설명 섹션
             st.markdown("---")
