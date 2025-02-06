@@ -31,20 +31,47 @@ def main():
     st.set_page_config(
         page_title="방 청결도 분석기",
         page_icon="🏠",
-        layout="centered"
+        layout="wide"  # 레이아웃을 wide로 변경
     )
     
     # 헤더 섹션
     st.title('🏠 방 청결도 분석기')
     st.markdown("""
     ### AI가 당신의 방이 얼마나 깨끗한지 분석해드립니다!
-    
-    방의 전체적인 모습이 잘 보이는 사진을 업로드해주세요.
-    AI가 방의 청결 상태를 즉시 분석해드립니다.
     """)
+    
+    # 예시 이미지로 설명하는 섹션
+    st.markdown("### 👀 이런 사진을 분석할 수 있어요!")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image("images/clean_room.jpg", caption="깨끗한 방의 예시", use_column_width=True)
+        st.success("✨ 깔끔하게 정리된 방")
+        st.markdown("""
+        - 물건들이 제자리에 있음
+        - 침대가 정리되어 있음
+        - 전반적으로 깔끔한 상태
+        """)
+    
+    with col2:
+        st.image("images/messy_room.jpg", caption="지저분한 방의 예시", use_column_width=True)
+        st.warning("⚠️ 정리가 필요한 방")
+        st.markdown("""
+        - 물건들이 흩어져 있음
+        - 침대가 정리되지 않음
+        - 전반적으로 어수선한 상태
+        """)
     
     # 구분선 추가
     st.markdown("---")
+    
+    # 사용 방법 설명
+    st.markdown("""
+    ### 🎯 사용 방법
+    1. 방 전체가 잘 보이는 사진을 준비하세요
+    2. 아래 업로드 버튼을 통해 사진을 올려주세요
+    3. AI가 자동으로 방의 청결 상태를 분석해드립니다
+    """)
     
     # 이미지 업로드 섹션
     st.subheader('📸 방 사진 업로드')
