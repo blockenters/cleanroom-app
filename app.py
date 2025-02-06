@@ -66,73 +66,75 @@ def main():
         st.caption("AI 기반 이미지 분석 서비스")
         st.caption("Blockenters")
     
-    # 메인 화면
-    st.title('방 청결도 분석')
-    st.markdown("""
-    ### AI가 당신의 방이 얼마나 깨끗한지 분석해드립니다!
-    방의 전체적인 모습이 잘 보이는 사진을 업로드해주세요.
-    """)
-    
-    # 이미지 업로드 섹션을 컨테이너로 감싸서 너비 제한
-    upload_container = st.container()
-    with upload_container:
-        col1, col2, col3 = st.columns([1,2,1])  # 3등분해서 가운데 column만 사용
-        with col2:
+    # 메인 화면 전체를 컨테이너로 감싸기
+    main_container = st.container()
+    with main_container:
+        col1, main_col, col3 = st.columns([1,2,1])  # 3등분해서 가운데 column만 사용
+        
+        with main_col:
+            st.title('방 청결도 분석')
+            st.markdown("""
+            ### AI가 당신의 방이 얼마나 깨끗한지 분석해드립니다!
+            방의 전체적인 모습이 잘 보이는 사진을 업로드해주세요.
+            """)
+            
+            # 이미지 업로드 섹션
             st.subheader('📸 방 사진 업로드')
             image = st.file_uploader(
                 '깨끗한 사진일수록 정확한 분석이 가능합니다.',
                 type=['jpg','png','jpeg']
             )
 
-    if image is not None:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("### 업로드된 이미지")
-            st.image(image, use_column_width=True)
+            if image is not None:
+                # 이미지와 분석 결과
+                img_col, result_col = st.columns(2)
+                
+                with img_col:
+                    st.markdown("### 업로드된 이미지")
+                    st.image(image, use_column_width=True)
 
-        with col2:
-            st.markdown("### 분석 결과")
-            with st.spinner('AI가 열심히 분석중입니다...'):
-                # 이미지 처리 및 예측
-                image_pil = Image.open(image)
-                model = load_model("model/keras_model.h5", compile=False)
-                class_names = open("model/labels.txt", "r", encoding='utf-8').readlines()
+                with result_col:
+                    st.markdown("### 분석 결과")
+                    with st.spinner('AI가 열심히 분석중입니다...'):
+                        # 이미지 처리 및 예측
+                        image_pil = Image.open(image)
+                        model = load_model("model/keras_model.h5", compile=False)
+                        class_names = open("model/labels.txt", "r", encoding='utf-8').readlines()
 
-                # 이미지 전처리
-                data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
-                size = (224, 224)
-                image_processed = ImageOps.fit(image_pil, size, Image.Resampling.LANCZOS)
-                image_array = np.asarray(image_processed)
-                normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
-                data[0] = normalized_image_array
+                        # 이미지 전처리
+                        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+                        size = (224, 224)
+                        image_processed = ImageOps.fit(image_pil, size, Image.Resampling.LANCZOS)
+                        image_array = np.asarray(image_processed)
+                        normalized_image_array = (image_array.astype(np.float32) / 127.5) - 1
+                        data[0] = normalized_image_array
 
-                # 예측
-                prediction = model.predict(data)
-                index = np.argmax(prediction)
-                class_name = class_names[index]
-                confidence_score = prediction[0][index]
+                        # 예측
+                        prediction = model.predict(data)
+                        index = np.argmax(prediction)
+                        class_name = class_names[index]
+                        confidence_score = prediction[0][index]
 
-                # 결과 표시
-                result_text = class_name[2:].strip()
-                confidence_percentage = float(confidence_score) * 100
+                        # 결과 표시
+                        result_text = class_name[2:].strip()
+                        confidence_percentage = float(confidence_score) * 100
 
-                if "깨끗한" in result_text:
-                    st.success(f"🌟 분석 결과: {result_text}")
-                else:
-                    st.warning(f"⚠️ 분석 결과: {result_text}")
+                        if "깨끗한" in result_text:
+                            st.success(f"🌟 분석 결과: {result_text}")
+                        else:
+                            st.warning(f"⚠️ 분석 결과: {result_text}")
 
-                st.progress(confidence_percentage / 100)
-                st.caption(f"신뢰도: {confidence_percentage:.1f}%")
+                        st.progress(confidence_percentage / 100)
+                        st.caption(f"신뢰도: {confidence_percentage:.1f}%")
 
-                # 결과 저장
-                save_history(result_text, confidence_percentage)
+                        # 결과 저장
+                        save_history(result_text, confidence_percentage)
 
                 # 통계 섹션
                 st.markdown("---")
                 st.subheader("📊 분석 통계")
                 
-                # 통계 차트들을 3개의 컬럼으로 나란히 배치
+                # 통계 차트들을 3개의 컬럼으로 배치
                 stat_col1, stat_col2, stat_col3 = st.columns(3)
                 
                 with stat_col1:
@@ -170,14 +172,14 @@ def main():
                     ).properties(width=200, height=200)
                     st.altair_chart(hourly_chart)
 
-    # 하단 설명 섹션
-    st.markdown("---")
-    st.markdown("""
-    ### 💡 사용 팁
-    1. **밝은 조명**: 방 전체가 잘 보이도록 밝은 조명에서 촬영하세요
-    2. **전체 구도**: 방의 전체적인 모습이 잘 보이게 찍어주세요
-    3. **선명도**: 흔들리지 않고 선명한 사진이 좋습니다
-    """)
+            # 하단 설명 섹션
+            st.markdown("---")
+            st.markdown("""
+            ### 💡 사용 팁
+            1. **밝은 조명**: 방 전체가 잘 보이도록 밝은 조명에서 촬영하세요
+            2. **전체 구도**: 방의 전체적인 모습이 잘 보이게 찍어주세요
+            3. **선명도**: 흔들리지 않고 선명한 사진이 좋습니다
+            """)
 
 if __name__ == '__main__':
     main()
