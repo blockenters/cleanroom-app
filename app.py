@@ -43,24 +43,31 @@ def main():
     # 예시 이미지로 설명하는 섹션
     st.markdown("### 👀 이런 사진을 분석할 수 있어요!")
     
-    col1, col2 = st.columns(2)
-    with col1:
-        st.image("images/clean.png", caption="깨끗한 방의 예시", use_column_width=True)
-        st.success("✨ 깔끔하게 정리된 방")
-        st.markdown("""
-        - 물건들이 제자리에 있음
-        - 침대가 정리되어 있음
-        - 전반적으로 깔끔한 상태
-        """)
-    
-    with col2:
-        st.image("images/messy.png", caption="지저분한 방의 예시", use_column_width=True)
-        st.warning("⚠️ 정리가 필요한 방")
-        st.markdown("""
-        - 물건들이 흩어져 있음
-        - 침대가 정리되지 않음
-        - 전반적으로 어수선한 상태
-        """)
+    # 전체 컨테이너를 만들어서 가운데 정렬
+    container = st.container()
+    with container:
+        # 3개의 컬럼을 만들어서 가운데 컬럼만 사용
+        left_spacer, content, right_spacer = st.columns([1,2,1])
+        
+        with content:
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image("images/clean.png", caption="깨끗한 방의 예시", use_container_width=True, width=250)
+                st.success("✨ 깔끔하게 정리된 방")
+                st.markdown("""
+                - 물건들이 제자리에 있음
+                - 침대가 정리되어 있음
+                - 전반적으로 깔끔한 상태
+                """)
+            
+            with col2:
+                st.image("images/messy.png", caption="지저분한 방의 예시", use_container_width=True, width=250)
+                st.warning("⚠️ 정리가 필요한 방")
+                st.markdown("""
+                - 물건들이 흩어져 있음
+                - 침대가 정리되지 않음
+                - 전반적으로 어수선한 상태
+                """)
     
     # 구분선 추가
     st.markdown("---")
