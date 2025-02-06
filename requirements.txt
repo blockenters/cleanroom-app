@@ -2,5 +2,7 @@ streamlit
 tensorflow==2.15
 pillow
 numpy
+altair>=4.0.0
+pandas>=1.0.0
 
 
