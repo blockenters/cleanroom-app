@@ -73,12 +73,16 @@ def main():
     방의 전체적인 모습이 잘 보이는 사진을 업로드해주세요.
     """)
     
-    # 이미지 업로드 섹션
-    st.subheader('📸 방 사진 업로드')
-    image = st.file_uploader(
-        '깨끗한 사진일수록 정확한 분석이 가능합니다.',
-        type=['jpg','png','jpeg']
-    )
+    # 이미지 업로드 섹션을 컨테이너로 감싸서 너비 제한
+    upload_container = st.container()
+    with upload_container:
+        col1, col2, col3 = st.columns([1,2,1])  # 3등분해서 가운데 column만 사용
+        with col2:
+            st.subheader('📸 방 사진 업로드')
+            image = st.file_uploader(
+                '깨끗한 사진일수록 정확한 분석이 가능합니다.',
+                type=['jpg','png','jpeg']
+            )
 
     if image is not None:
         col1, col2 = st.columns(2)
