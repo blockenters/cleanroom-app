@@ -31,50 +31,46 @@ def main():
     st.set_page_config(
         page_title="방 청결도 분석기",
         page_icon="🏠",
-        layout="wide"  # 레이아웃을 wide로 변경
+        layout="wide"
     )
     
-    # 헤더 섹션
-    st.title('🏠 방 청결도 분석기')
+    # 사이드바 대시보드
+    with st.sidebar:
+        st.title('🏠 방 청결도 분석기')
+        st.markdown("---")
+        
+        st.markdown("### 👀 분석 가능한 방 예시")
+        
+        # 깨끗한 방 예시
+        st.image("images/clean.png", caption="깨끗한 방", width=200)
+        st.success("✨ 깔끔하게 정리된 방")
+        st.markdown("""
+        - 물건들이 제자리에 있음
+        - 침대가 정리되어 있음
+        - 전반적으로 깔끔한 상태
+        """)
+        
+        st.markdown("---")
+        
+        # 지저분한 방 예시
+        st.image("images/messy.png", caption="지저분한 방", width=200)
+        st.warning("⚠️ 정리가 필요한 방")
+        st.markdown("""
+        - 물건들이 흩어져 있음
+        - 침대가 정리되지 않음
+        - 전반적으로 어수선한 상태
+        """)
+        
+        st.markdown("---")
+        st.caption("© 2025 방 청결도 분석기")
+        st.caption("AI 기반 이미지 분석 서비스")
+        st.caption("Blockenters")
+    
+    # 메인 화면
+    st.title('방 청결도 분석')
     st.markdown("""
     ### AI가 당신의 방이 얼마나 깨끗한지 분석해드립니다!
-    """)
-    
-    # 예시 이미지로 설명하는 섹션
-    st.markdown("### 👀 이런 사진을 분석할 수 있어요!")
-    
-    # 전체 컨테이너를 만들어서 왼쪽 정렬
-    container = st.container()
-    with container:
-        col1, col2, col3 = st.columns([2,2,4])  # 왼쪽에 더 많은 공간 할당
-        
-        with col1:
-            st.image("images/clean.png", caption="깨끗한 방의 예시", width=250)
-            st.success("✨ 깔끔하게 정리된 방")
-            st.markdown("""
-            - 물건들이 제자리에 있음
-            - 침대가 정리되어 있음
-            - 전반적으로 깔끔한 상태
-            """)
-        
-        with col2:
-            st.image("images/messy.png", caption="지저분한 방의 예시", width=250)
-            st.warning("⚠️ 정리가 필요한 방")
-            st.markdown("""
-            - 물건들이 흩어져 있음
-            - 침대가 정리되지 않음
-            - 전반적으로 어수선한 상태
-            """)
-    
-    # 구분선 추가
-    st.markdown("---")
-    
-    # 사용 방법 설명
-    st.markdown("""
-    ### 🎯 사용 방법
-    1. 방 전체가 잘 보이는 사진을 준비하세요
-    2. 아래 업로드 버튼을 통해 사진을 올려주세요
-    3. AI가 자동으로 방의 청결 상태를 분석해드립니다
+    방의 전체적인 모습이 잘 보이는 사진을 업로드해주세요.
     """)
     
     # 이미지 업로드 섹션
@@ -85,7 +81,6 @@ def main():
     )
 
     if image is not None:
-        # 이미지 표시 컬럼
         col1, col2 = st.columns(2)
         
         with col1:
@@ -129,54 +124,46 @@ def main():
                 # 결과 저장
                 save_history(result_text, confidence_percentage)
 
-                # 통계 섹션 추가
+                # 통계 섹션
                 st.markdown("---")
                 st.subheader("📊 분석 통계")
                 
-                # 데이터 로드
-                history = load_history()
-                if history:
-                    df = pd.DataFrame(history)
-                    df['date'] = pd.to_datetime(df['timestamp']).dt.date
-                    
-                    # 1. 깨끗한/더러운 방 비율 파이 차트
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        room_counts = df['result'].value_counts()
-                        st.subheader("방 상태 분포")
-                        fig_pie = alt.Chart(pd.DataFrame({
-                            'category': room_counts.index,
-                            'count': room_counts.values
-                        })).mark_arc().encode(
-                            theta='count',
-                            color='category',
-                            tooltip=['category', 'count']
-                        ).properties(width=200, height=200)
-                        st.altair_chart(fig_pie)
-                    
-                    # 2. 최근 분석 신뢰도 트렌드
-                    with col2:
-                        st.subheader("신뢰도 트렌드")
-                        recent_df = df.tail(10)  # 최근 10개 결과
-                        confidence_trend = alt.Chart(recent_df).mark_line().encode(
-                            x='timestamp',
-                            y=alt.Y('confidence', title='신뢰도 (%)')
-                        ).properties(width=300, height=200)
-                        st.altair_chart(confidence_trend)
-                    
-                    # 3. 시간대별 분석 횟수
+                # 통계 차트들을 3개의 컬럼으로 나란히 배치
+                stat_col1, stat_col2, stat_col3 = st.columns(3)
+                
+                with stat_col1:
+                    st.subheader("방 상태 분포")
+                    room_counts = df['result'].value_counts()
+                    fig_pie = alt.Chart(pd.DataFrame({
+                        'category': room_counts.index,
+                        'count': room_counts.values
+                    })).mark_arc().encode(
+                        theta='count',
+                        color='category',
+                        tooltip=['category', 'count']
+                    ).properties(width=200, height=200)
+                    st.altair_chart(fig_pie)
+                
+                with stat_col2:
+                    st.subheader("신뢰도 트렌드")
+                    recent_df = df.tail(10)
+                    confidence_trend = alt.Chart(recent_df).mark_line().encode(
+                        x='timestamp',
+                        y=alt.Y('confidence', title='신뢰도 (%)')
+                    ).properties(width=200, height=200)
+                    st.altair_chart(confidence_trend)
+                
+                with stat_col3:
+                    st.subheader("시간대별 분석")
                     df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
                     hourly_counts = df['hour'].value_counts().sort_index()
-                    
-                    st.subheader("시간대별 분석 횟수")
                     hourly_chart = alt.Chart(pd.DataFrame({
                         'hour': hourly_counts.index,
                         'count': hourly_counts.values
                     })).mark_bar().encode(
                         x=alt.X('hour:O', title='시간'),
-                        y=alt.Y('count:Q', title='분석 횟수'),
-                        tooltip=['hour', 'count']
-                    ).properties(width=600, height=200)
+                        y=alt.Y('count:Q', title='분석 횟수')
+                    ).properties(width=200, height=200)
                     st.altair_chart(hourly_chart)
 
     # 하단 설명 섹션
@@ -187,10 +174,6 @@ def main():
     2. **전체 구도**: 방의 전체적인 모습이 잘 보이게 찍어주세요
     3. **선명도**: 흔들리지 않고 선명한 사진이 좋습니다
     """)
-
-    # 푸터
-    st.markdown("---")
-    st.caption("© 2025 방 청결도 분석기 | AI 기반 이미지 분석 서비스 | Blockenters")
 
 if __name__ == '__main__':
     main()
